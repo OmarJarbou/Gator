@@ -37,14 +37,14 @@ func (cmds *commands) run(state *state, cmd command) error {
 			return err
 		}
 	default:
-		return errors.New("command not found")
+		return errors.New("COMMAND NOT FOUND")
 	}
 	return nil
 }
 
 func handleLogin(state *state, cmd command) error {
 	if len(cmd.Arguments) == 0 {
-		return errors.New("the login handler expects a single argument, the username")
+		return errors.New("THE LOGIN HANDLER EXPECTS A SINGLE ARGUMENT, THE USERNAME")
 	}
 	err := config.SetUser(cmd.Arguments[0], state.Config)
 	if err != nil {

@@ -11,7 +11,7 @@ func cli(stt *state, cmds *commands, args []string) error {
 	cmd := commandMapping(args[1], args[2:])
 	err := cmds.run(stt, cmd)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	return nil
 }
