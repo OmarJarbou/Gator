@@ -1,16 +1,28 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
-	"github.com/OmarJarbou/Gator/internal/config"
-	_ "github.com/lib/pq"
 	"os"
+
+	"github.com/OmarJarbou/Gator/internal/config"
+	"github.com/OmarJarbou/Gator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 func main() {
 	confg := config.Read()
+
+	db, err := sql.Open("postgres", confg.DbURL)
+	if err != nil {
+		fmt.Errorf("failed to open database: %v", err)
+	}
+
+	dbQueries := database.New(db)
+
 	stt := state{
-		Config: &confg,
+		DBQueries: dbQueries,
+		Config:    &confg,
 	}
 
 	cmds := commands{
@@ -19,9 +31,9 @@ func main() {
 
 	cmds.register("login", handleLogin)
 
-	err := cli(&stt, &cmds, os.Args)
-	if err != nil {
-		fmt.Println(err)
+	err2 := cli(&stt, &cmds, os.Args)
+	if err2 != nil {
+		fmt.Println(err2)
 		os.Exit(1)
 	}
 }
