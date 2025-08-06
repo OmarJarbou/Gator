@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/OmarJarbou/Gator/internal/config"
+	_ "github.com/lib/pq"
+	"os"
 )
 
 func main() {
