@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/OmarJarbou/Gator/internal/config"
 )
 
@@ -16,5 +19,9 @@ func main() {
 
 	cmds.register("login", handleLogin)
 
-	repl(&stt, &cmds)
+	err := cli(&stt, &cmds, os.Args)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
