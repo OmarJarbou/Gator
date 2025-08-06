@@ -15,7 +15,8 @@ func main() {
 
 	db, err := sql.Open("postgres", confg.DbURL)
 	if err != nil {
-		fmt.Errorf("failed to open database: %v", err)
+		fmt.Println("FAILED TO OPEN DATABASE:", err)
+		os.Exit(1)
 	}
 
 	dbQueries := database.New(db)
