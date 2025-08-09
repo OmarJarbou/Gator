@@ -100,3 +100,7 @@ func handleRegister(state *state, cmd command) error {
 
 	return nil
 }
+
+func handleReset(state *state, cmd command) error {
+	return nil
+}
