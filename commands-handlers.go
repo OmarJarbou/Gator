@@ -144,15 +144,9 @@ func handleAggregate(state *state, cmd command) error {
 	return nil
 }
 
-func handleAddFeed(state *state, cmd command) error {
+func handleAddFeed(state *state, cmd command, currentUser database.User) error {
 	if len(cmd.Arguments) != 2 {
 		return errors.New("THE ADD FEED HANDLER EXPECTS TWO ARGUMENT, THE NAME AND THE URL OF THE FEED")
-	}
-
-	currentUserName := state.Config.CurrentUserName
-	currentUser, err := state.DBQueries.GetUser(context.Background(), currentUserName)
-	if err != nil {
-		return errors.New("FAILED TO GET CURRENT USER: " + err.Error())
 	}
 
 	feed := database.CreateFeedParams{
@@ -210,7 +204,7 @@ func handleListFeeds(state *state, cmd command) error {
 	return nil
 }
 
-func handleFollowFeed(state *state, cmd command) error {
+func handleFollowFeed(state *state, cmd command, currentUser database.User) error {
 	if len(cmd.Arguments) != 1 {
 		return errors.New("THE FOLLOW FEED HANDLER EXPECTS A SINGLE ARGUMENT, THE FEED URL")
 	}
@@ -219,12 +213,6 @@ func handleFollowFeed(state *state, cmd command) error {
 	feed, err := state.DBQueries.GetFeedByURL(context.Background(), feedURL)
 	if err != nil {
 		return errors.New("FAILED TO GET FEED: " + err.Error())
-	}
-
-	currentUserName := state.Config.CurrentUserName
-	currentUser, err2 := state.DBQueries.GetUser(context.Background(), currentUserName)
-	if err2 != nil {
-		return errors.New("FAILED TO GET CURRENT USER: " + err2.Error())
 	}
 
 	feedFollow := database.CreateFeedFollowParams{
@@ -245,18 +233,17 @@ func handleFollowFeed(state *state, cmd command) error {
 	return nil
 }
 
-func handleListFollowing(state *state, cmd command) error {
+func handleListFollowing(state *state, cmd command, currentUser database.User) error {
 	if len(cmd.Arguments) != 0 {
 		return errors.New("THE LIST FOLLOWING HANDLER DOES NOT EXPECT ANY ARGUMENTS")
 	}
 
-	currentUserName := state.Config.CurrentUserName
-	followedFeeds, err := state.DBQueries.GetFeedFollowsForUser(context.Background(), currentUserName)
+	followedFeeds, err := state.DBQueries.GetFeedFollowsForUser(context.Background(), currentUser.Name)
 	if err != nil {
 		return errors.New("FAILED TO GET FOLLOWED FEEDS: " + err.Error())
 	}
 
-	fmt.Println("Feeds followed by", currentUserName+":")
+	fmt.Println("Feeds followed by", currentUser.Name+":")
 	for _, feed := range followedFeeds {
 		fmt.Println(feed.FeedName)
 	}

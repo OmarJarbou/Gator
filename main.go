@@ -35,10 +35,10 @@ func main() {
 	cmds.register("reset", handleReset)
 	cmds.register("users", handleListUsers)
 	cmds.register("agg", handleAggregate)
-	cmds.register("addfeed", handleAddFeed)
+	cmds.register("addfeed", middlewareLoggedIn(handleAddFeed))
 	cmds.register("feeds", handleListFeeds)
-	cmds.register("follow", handleFollowFeed)
-	cmds.register("following", handleListFollowing)
+	cmds.register("follow", middlewareLoggedIn(handleFollowFeed))
+	cmds.register("following", middlewareLoggedIn(handleListFollowing))
 
 	err2 := cli(&stt, &cmds, os.Args)
 	if err2 != nil {
