@@ -40,6 +40,7 @@ func main() {
 	cmds.register("follow", middlewareLoggedIn(handleFollowFeed))
 	cmds.register("following", middlewareLoggedIn(handleListFollowing))
 	cmds.register("unfollow", middlewareLoggedIn(handleUnfollowFeed))
+	cmds.register("browse", middlewareLoggedIn(handleBrowsePosts))
 
 	err2 := cli(&stt, &cmds, os.Args)
 	if err2 != nil {

@@ -7,6 +7,8 @@ import (
 	"context"
 	"time"
 
+	"strconv"
+
 	"github.com/OmarJarbou/Gator/internal/config"
 	"github.com/OmarJarbou/Gator/internal/database"
 	"github.com/google/uuid"
@@ -147,6 +149,7 @@ func handleAggregate(state *state, cmd command) error {
 		if err2 != nil {
 			return err2
 		}
+		fmt.Println("--------------------------------")
 	}
 }
 
@@ -273,5 +276,45 @@ func handleUnfollowFeed(state *state, cmd command, currentUser database.User) er
 
 	fmt.Println("Feed", feedURL, "unfollowed successfully by user", currentUser.Name+"!")
 
+	return nil
+}
+
+func handleBrowsePosts(state *state, cmd command, currentUser database.User) error {
+	if len(cmd.Arguments) != 0 && len(cmd.Arguments) != 1 {
+		return errors.New("THE BROWSE POSTS HANDLER DOES NOT EXPECT ANY ARGUMENTS OR A SINGLE ARGUMENT, THE LIMIT")
+	}
+
+	var limit int64
+	var err error
+	if len(cmd.Arguments) == 0 {
+		limit = 2
+	} else {
+		limit, err = strconv.ParseInt(cmd.Arguments[0], 10, 64)
+		if err != nil {
+			return errors.New("FAILED TO PARSE LIMIT: " + err.Error())
+		}
+	}
+
+	params := database.GetPostsForUserParams{
+		UserID: currentUser.ID,
+		Limit:  int32(limit),
+	}
+
+	posts, err2 := state.DBQueries.GetPostsForUser(context.Background(), params)
+	if err2 != nil {
+		return errors.New("FAILED TO GET POSTS: " + err2.Error())
+	}
+
+	for _, post := range posts {
+		fmt.Println("Post #" + post.ID.String())
+		fmt.Println("Feed ID:", post.FeedID)
+		fmt.Println("Title:", post.Title)
+		fmt.Println("URL:", post.Url)
+		fmt.Println("Description:", post.Description)
+		fmt.Println("Published at:", post.PublishedAt)
+		fmt.Println("Created at:", post.CreatedAt)
+		fmt.Println("Updated at:", post.UpdatedAt)
+		fmt.Println("--------------------------------")
+	}
 	return nil
 }
