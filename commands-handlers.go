@@ -108,6 +108,14 @@ func handleReset(state *state, cmd command) error {
 	if err2 != nil {
 		return errors.New("FAILED TO RESET DB (CLEAR FEEDS ISSUE): " + err2.Error())
 	}
+	err3 := state.DBQueries.ClearFeedFollows(context.Background())
+	if err3 != nil {
+		return errors.New("FAILED TO RESET DB (CLEAR FEED FOLLOWS ISSUE): " + err3.Error())
+	}
+	err4 := state.DBQueries.ClearPosts(context.Background())
+	if err4 != nil {
+		return errors.New("FAILED TO RESET DB (CLEAR POSTS ISSUE): " + err4.Error())
+	}
 	fmt.Println("DB reset successfully!")
 	return nil
 }

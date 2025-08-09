@@ -12,6 +12,15 @@ import (
 	"github.com/google/uuid"
 )
 
+const clearPosts = `-- name: ClearPosts :exec
+DELETE FROM posts
+`
+
+func (q *Queries) ClearPosts(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, clearPosts)
+	return err
+}
+
 const createPost = `-- name: CreatePost :one
 INSERT INTO posts (title, url, description, published_at, feed_id)
 VALUES ($1, $2, $3, $4, $5)

@@ -23,3 +23,6 @@ WITH feed_record AS (
 )
 DELETE FROM feed_follows
 WHERE user_id = $2 AND feed_id = (SELECT id FROM feed_record);
+
+-- name: ClearFeedFollows :exec
+DELETE FROM feed_follows;
