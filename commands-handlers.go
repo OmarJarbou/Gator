@@ -34,6 +34,11 @@ func commandMapping(cmd string, args []string) command {
 			Name:      "reset",
 			Arguments: args,
 		}
+	case "users":
+		cmnd = command{
+			Name:      "users",
+			Arguments: args,
+		}
 	default:
 		return cmnd
 	}
@@ -115,5 +120,25 @@ func handleReset(state *state, cmd command) error {
 		return errors.New("FAILED TO RESET DB: " + err.Error())
 	}
 	fmt.Println("DB reset successfully!")
+	return nil
+}
+
+func handleListUsers(state *state, cmd command) error {
+	if len(cmd.Arguments) != 0 {
+		return errors.New("THE LIST USERS HANDLER DOES NOT EXPECT ANY ARGUMENTS")
+	}
+
+	users, err := state.DBQueries.GetUsers(context.Background())
+	if err != nil {
+		return errors.New("FAILED TO GET USERS: " + err.Error())
+	}
+
+	for _, user := range users {
+		if state.Config.CurrentUserName == user.Name {
+			fmt.Println("*", user.Name, "(current)")
+		} else {
+			fmt.Println("*", user.Name)
+		}
+	}
 	return nil
 }
