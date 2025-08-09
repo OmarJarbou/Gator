@@ -34,6 +34,7 @@ func main() {
 	cmds.register("register", handleRegister)
 	cmds.register("reset", handleReset)
 	cmds.register("users", handleListUsers)
+	cmds.register("agg", handleAggregate)
 
 	err2 := cli(&stt, &cmds, os.Args)
 	if err2 != nil {

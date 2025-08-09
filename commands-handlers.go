@@ -39,6 +39,11 @@ func commandMapping(cmd string, args []string) command {
 			Name:      "users",
 			Arguments: args,
 		}
+	case "agg":
+		cmnd = command{
+			Name:      "agg",
+			Arguments: args,
+		}
 	default:
 		return cmnd
 	}
@@ -140,5 +145,20 @@ func handleListUsers(state *state, cmd command) error {
 			fmt.Println("*", user.Name)
 		}
 	}
+	return nil
+}
+
+func handleAggregate(state *state, cmd command) error {
+	if len(cmd.Arguments) != 0 {
+		return errors.New("THE AGGREGATE HANDLER DOES NOT EXPECT ANY ARGUMENTS")
+	}
+
+	feedURL := "https://www.wagslane.dev/index.xml"
+	rssFeed, err := fetchFeed(context.Background(), feedURL)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(rssFeed)
 	return nil
 }

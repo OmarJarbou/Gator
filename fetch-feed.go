@@ -39,12 +39,15 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 		return nil, errors.New("FAILED TO UNMARSHAL FEED: " + err4.Error())
 	}
 
-	rssFeed.Channel.Description = html.UnescapeString(rssFeed.Channel.Description)
 	rssFeed.Channel.Title = html.UnescapeString(rssFeed.Channel.Title)
+	rssFeed.Channel.Link = html.UnescapeString(rssFeed.Channel.Link)
+	rssFeed.Channel.Description = html.UnescapeString(rssFeed.Channel.Description)
 
 	for _, item := range rssFeed.Channel.Item {
-		item.Description = html.UnescapeString(item.Description)
 		item.Title = html.UnescapeString(item.Title)
+		item.Link = html.UnescapeString(item.Link)
+		item.Description = html.UnescapeString(item.Description)
+		item.PubDate = html.UnescapeString(item.PubDate)
 	}
 
 	return &rssFeed, nil
