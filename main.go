@@ -31,6 +31,7 @@ func main() {
 	}
 
 	cmds.register("login", handleLogin)
+	cmds.register("register", handleRegister)
 
 	err2 := cli(&stt, &cmds, os.Args)
 	if err2 != nil {
