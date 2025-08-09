@@ -9,3 +9,6 @@ WHERE name = $1;
 
 -- name: ResetDB :exec
 DELETE FROM users;
+
+-- name: GetUsers :many
+SELECT * FROM users;
