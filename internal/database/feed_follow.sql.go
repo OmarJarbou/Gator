@@ -65,7 +65,7 @@ func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowPara
 
 const deleteFeedFollow = `-- name: DeleteFeedFollow :exec
 WITH feed_record AS (
-    SELECT id, created_at, updated_at, name, url FROM feeds
+    SELECT id, created_at, updated_at, name, url, last_fetched_at FROM feeds
     WHERE url = $1
 )
 DELETE FROM feed_follows

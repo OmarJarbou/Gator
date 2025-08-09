@@ -12,3 +12,8 @@ WHERE url = $1;
 
 -- name: ClearFeeds :exec
 DELETE FROM feeds;
+
+-- name: MarkFeedFetched :exec
+UPDATE feeds
+SET last_fetched_at = NOW()
+WHERE id = $1;
