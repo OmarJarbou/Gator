@@ -161,7 +161,6 @@ func handleAddFeed(state *state, cmd command) error {
 		UpdatedAt: time.Now(),
 		Name:      cmd.Arguments[0],
 		Url:       cmd.Arguments[1],
-		UserID:    currentUser.ID,
 	}
 
 	createdFeed, err2 := state.DBQueries.CreateFeed(context.Background(), feed)
@@ -172,8 +171,21 @@ func handleAddFeed(state *state, cmd command) error {
 	fmt.Println("Feed", createdFeed.Name, "added successfully!")
 	fmt.Println("Created at:", createdFeed.CreatedAt)
 	fmt.Println("URL:", createdFeed.Url)
-	fmt.Println("User ID:", createdFeed.UserID)
-	fmt.Println("User Name:", currentUser.Name)
+
+	feedFollow := database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    currentUser.ID,
+		FeedID:    createdFeed.ID,
+	}
+
+	createdFeedFollow, err3 := state.DBQueries.CreateFeedFollow(context.Background(), feedFollow)
+	if err3 != nil {
+		return errors.New("FAILED TO CREATE FEED FOLLOW: " + err3.Error())
+	}
+
+	fmt.Println("Feed", createdFeedFollow.FeedName, "followed successfully by user", createdFeedFollow.UserName+"!")
 
 	return nil
 }
@@ -189,17 +201,46 @@ func handleListFeeds(state *state, cmd command) error {
 	}
 
 	for _, feed := range feeds {
-		user, err2 := state.DBQueries.GetUserByID(context.Background(), feed.UserID)
-		if err2 != nil {
-			return errors.New("FAILED TO GET USER OF FEED #" + feed.ID.String() + ": " + err2.Error())
-		}
 		fmt.Println("Feed #" + feed.ID.String())
 		fmt.Println("Name:", feed.Name)
 		fmt.Println("URL:", feed.Url)
-		fmt.Println("User ID:", feed.UserID)
-		fmt.Println("User Name:", user.Name)
 		fmt.Println("Created at:", feed.CreatedAt)
 		fmt.Println("Updated at:", feed.UpdatedAt)
 	}
+	return nil
+}
+
+func handleFollowFeed(state *state, cmd command) error {
+	if len(cmd.Arguments) != 1 {
+		return errors.New("THE FOLLOW FEED HANDLER EXPECTS A SINGLE ARGUMENT, THE FEED URL")
+	}
+
+	feedURL := cmd.Arguments[0]
+	feed, err := state.DBQueries.GetFeedByURL(context.Background(), feedURL)
+	if err != nil {
+		return errors.New("FAILED TO GET FEED: " + err.Error())
+	}
+
+	currentUserName := state.Config.CurrentUserName
+	currentUser, err2 := state.DBQueries.GetUser(context.Background(), currentUserName)
+	if err2 != nil {
+		return errors.New("FAILED TO GET CURRENT USER: " + err2.Error())
+	}
+
+	feedFollow := database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    currentUser.ID,
+		FeedID:    feed.ID,
+	}
+
+	createdFeedFollow, err3 := state.DBQueries.CreateFeedFollow(context.Background(), feedFollow)
+	if err3 != nil {
+		return errors.New("FAILED TO CREATE FEED FOLLOW: " + err3.Error())
+	}
+
+	fmt.Println("Feed", createdFeedFollow.FeedName, "followed successfully by user", createdFeedFollow.UserName+"!")
+
 	return nil
 }
