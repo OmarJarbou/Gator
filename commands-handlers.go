@@ -16,41 +16,14 @@ type commands struct {
 	cmdsMap map[string]func(*state, command) error
 }
 
-func commandMapping(cmd string, args []string) command {
+func (cmds *commands) commandMapping(cmd string, args []string) command {
 	var cmnd command
-	switch cmd {
-	case "login":
-		cmnd = command{
-			Name:      "login",
+	_, ok := cmds.cmdsMap[cmd]
+	if ok {
+		return command{
+			Name:      cmd,
 			Arguments: args,
 		}
-	case "register":
-		cmnd = command{
-			Name:      "register",
-			Arguments: args,
-		}
-	case "reset":
-		cmnd = command{
-			Name:      "reset",
-			Arguments: args,
-		}
-	case "users":
-		cmnd = command{
-			Name:      "users",
-			Arguments: args,
-		}
-	case "agg":
-		cmnd = command{
-			Name:      "agg",
-			Arguments: args,
-		}
-	case "addfeed":
-		cmnd = command{
-			Name:      "addfeed",
-			Arguments: args,
-		}
-	default:
-		return cmnd
 	}
 	return cmnd
 }
@@ -142,7 +115,6 @@ func handleListUsers(state *state, cmd command) error {
 	if err != nil {
 		return errors.New("FAILED TO GET USERS: " + err.Error())
 	}
-
 	for _, user := range users {
 		if state.Config.CurrentUserName == user.Name {
 			fmt.Println("*", user.Name, "(current)")
@@ -199,5 +171,31 @@ func handleAddFeed(state *state, cmd command) error {
 	fmt.Println("User ID:", createdFeed.UserID)
 	fmt.Println("User Name:", currentUser.Name)
 
+	return nil
+}
+
+func handleListFeeds(state *state, cmd command) error {
+	if len(cmd.Arguments) != 0 {
+		return errors.New("THE LIST FEEDS HANDLER DOES NOT EXPECT ANY ARGUMENTS")
+	}
+
+	feeds, err := state.DBQueries.GetFeeds(context.Background())
+	if err != nil {
+		return errors.New("FAILED TO GET FEEDS: " + err.Error())
+	}
+
+	for _, feed := range feeds {
+		user, err2 := state.DBQueries.GetUserByID(context.Background(), feed.UserID)
+		if err2 != nil {
+			return errors.New("FAILED TO GET USER OF FEED #" + feed.ID.String() + ": " + err2.Error())
+		}
+		fmt.Println("Feed #" + feed.ID.String())
+		fmt.Println("Name:", feed.Name)
+		fmt.Println("URL:", feed.Url)
+		fmt.Println("User ID:", feed.UserID)
+		fmt.Println("User Name:", user.Name)
+		fmt.Println("Created at:", feed.CreatedAt)
+		fmt.Println("Updated at:", feed.UpdatedAt)
+	}
 	return nil
 }

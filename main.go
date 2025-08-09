@@ -36,6 +36,7 @@ func main() {
 	cmds.register("users", handleListUsers)
 	cmds.register("agg", handleAggregate)
 	cmds.register("addfeed", handleAddFeed)
+	cmds.register("feeds", handleListFeeds)
 
 	err2 := cli(&stt, &cmds, os.Args)
 	if err2 != nil {
