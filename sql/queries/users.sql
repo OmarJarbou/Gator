@@ -11,7 +11,7 @@ WHERE name = $1;
 SELECT * FROM users
 WHERE id = $1;
 
--- name: ResetDB :exec
+-- name: ClearUsers :exec
 DELETE FROM users;
 
 -- name: GetUsers :many

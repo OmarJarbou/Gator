@@ -12,6 +12,15 @@ import (
 	"github.com/google/uuid"
 )
 
+const clearFeeds = `-- name: ClearFeeds :exec
+DELETE FROM feeds
+`
+
+func (q *Queries) ClearFeeds(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, clearFeeds)
+	return err
+}
+
 const createFeed = `-- name: CreateFeed :one
 INSERT INTO feeds (id, created_at, updated_at, name, url, user_id)
 VALUES ($1, $2, $3, $4, $5, $6)

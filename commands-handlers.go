@@ -98,9 +98,13 @@ func handleReset(state *state, cmd command) error {
 	if len(cmd.Arguments) != 0 {
 		return errors.New("THE RESET HANDLER DOES NOT EXPECT ANY ARGUMENTS")
 	}
-	err := state.DBQueries.ResetDB(context.Background())
+	err := state.DBQueries.ClearUsers(context.Background())
 	if err != nil {
-		return errors.New("FAILED TO RESET DB: " + err.Error())
+		return errors.New("FAILED TO RESET DB (CLEAR USERS ISSUE): " + err.Error())
+	}
+	err2 := state.DBQueries.ClearFeeds(context.Background())
+	if err2 != nil {
+		return errors.New("FAILED TO RESET DB (CLEAR FEEDS ISSUE): " + err2.Error())
 	}
 	fmt.Println("DB reset successfully!")
 	return nil

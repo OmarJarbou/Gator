@@ -5,3 +5,6 @@ RETURNING *;
 
 -- name: GetFeeds :many
 SELECT * FROM feeds;
+
+-- name: ClearFeeds :exec
+DELETE FROM feeds;
