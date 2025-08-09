@@ -29,6 +29,11 @@ func commandMapping(cmd string, args []string) command {
 			Name:      "register",
 			Arguments: args,
 		}
+	case "reset":
+		cmnd = command{
+			Name:      "reset",
+			Arguments: args,
+		}
 	default:
 		return cmnd
 	}
@@ -102,5 +107,13 @@ func handleRegister(state *state, cmd command) error {
 }
 
 func handleReset(state *state, cmd command) error {
+	if len(cmd.Arguments) != 0 {
+		return errors.New("THE RESET HANDLER DOES NOT EXPECT ANY ARGUMENTS")
+	}
+	err := state.DBQueries.ResetDB(context.Background())
+	if err != nil {
+		return errors.New("FAILED TO RESET DB: " + err.Error())
+	}
+	fmt.Println("DB reset successfully!")
 	return nil
 }
