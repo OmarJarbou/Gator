@@ -249,3 +249,23 @@ func handleListFollowing(state *state, cmd command, currentUser database.User) e
 	}
 	return nil
 }
+
+func handleUnfollowFeed(state *state, cmd command, currentUser database.User) error {
+	if len(cmd.Arguments) != 1 {
+		return errors.New("THE UNFOLLOW FEED HANDLER EXPECTS A SINGLE ARGUMENT, THE FEED URL")
+	}
+
+	feedURL := cmd.Arguments[0]
+	deleteFeedFollowParams := database.DeleteFeedFollowParams{
+		Url:    feedURL,
+		UserID: currentUser.ID,
+	}
+	err := state.DBQueries.DeleteFeedFollow(context.Background(), deleteFeedFollowParams)
+	if err != nil {
+		return errors.New("FAILED TO DELETE FEED FOLLOW: " + err.Error())
+	}
+
+	fmt.Println("Feed", feedURL, "unfollowed successfully by user", currentUser.Name+"!")
+
+	return nil
+}
