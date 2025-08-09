@@ -44,6 +44,11 @@ func commandMapping(cmd string, args []string) command {
 			Name:      "agg",
 			Arguments: args,
 		}
+	case "addfeed":
+		cmnd = command{
+			Name:      "addfeed",
+			Arguments: args,
+		}
 	default:
 		return cmnd
 	}
@@ -67,7 +72,7 @@ func (cmds *commands) run(state *state, cmd command) error {
 }
 
 func handleLogin(state *state, cmd command) error {
-	if len(cmd.Arguments) == 0 || len(cmd.Arguments) > 1 {
+	if len(cmd.Arguments) != 1 {
 		return errors.New("THE LOGIN HANDLER EXPECTS A SINGLE ARGUMENT, THE USERNAME")
 	}
 	_, err := state.DBQueries.GetUser(context.Background(), cmd.Arguments[0])
@@ -83,7 +88,7 @@ func handleLogin(state *state, cmd command) error {
 }
 
 func handleRegister(state *state, cmd command) error {
-	if len(cmd.Arguments) == 0 || len(cmd.Arguments) > 1 {
+	if len(cmd.Arguments) != 1 {
 		return errors.New("THE REGISTER HANDLER EXPECTS A SINGLE ARGUMENT, THE USERNAME")
 	}
 	_, err := state.DBQueries.GetUser(context.Background(), cmd.Arguments[0])
@@ -160,5 +165,39 @@ func handleAggregate(state *state, cmd command) error {
 	}
 
 	fmt.Println(rssFeed)
+	return nil
+}
+
+func handleAddFeed(state *state, cmd command) error {
+	if len(cmd.Arguments) != 2 {
+		return errors.New("THE ADD FEED HANDLER EXPECTS TWO ARGUMENT, THE NAME AND THE URL OF THE FEED")
+	}
+
+	currentUserName := state.Config.CurrentUserName
+	currentUser, err := state.DBQueries.GetUser(context.Background(), currentUserName)
+	if err != nil {
+		return errors.New("FAILED TO GET CURRENT USER: " + err.Error())
+	}
+
+	feed := database.CreateFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      cmd.Arguments[0],
+		Url:       cmd.Arguments[1],
+		UserID:    currentUser.ID,
+	}
+
+	createdFeed, err2 := state.DBQueries.CreateFeed(context.Background(), feed)
+	if err2 != nil {
+		return errors.New("FAILED TO CREATE FEED: " + err2.Error())
+	}
+
+	fmt.Println("Feed", createdFeed.Name, "added successfully!")
+	fmt.Println("Created at:", createdFeed.CreatedAt)
+	fmt.Println("URL:", createdFeed.Url)
+	fmt.Println("User ID:", createdFeed.UserID)
+	fmt.Println("User Name:", currentUser.Name)
+
 	return nil
 }
