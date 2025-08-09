@@ -130,18 +130,24 @@ func handleListUsers(state *state, cmd command) error {
 }
 
 func handleAggregate(state *state, cmd command) error {
-	if len(cmd.Arguments) != 0 {
-		return errors.New("THE AGGREGATE HANDLER DOES NOT EXPECT ANY ARGUMENTS")
+	if len(cmd.Arguments) != 1 {
+		return errors.New("THE AGGREGATE HANDLER EXPECTS A SINGLE ARGUMENT, THE TIME BETWEEN REQUESTS")
 	}
 
-	feedURL := "https://www.wagslane.dev/index.xml"
-	rssFeed, err := fetchFeed(context.Background(), feedURL)
+	timeBetweenRequests := cmd.Arguments[0]
+	timeBetweenRequestsDuration, err := time.ParseDuration(timeBetweenRequests)
 	if err != nil {
-		return err
+		return errors.New("FAILED TO PARSE TIME BETWEEN REQUESTS: " + err.Error())
 	}
+	fmt.Println("Collecting feeds every:", timeBetweenRequestsDuration)
 
-	fmt.Println(rssFeed)
-	return nil
+	ticker := time.NewTicker(timeBetweenRequestsDuration)
+	for ; ; <-ticker.C {
+		err2 := scrapeFeeds(context.Background(), state)
+		if err2 != nil {
+			return err2
+		}
+	}
 }
 
 func handleAddFeed(state *state, cmd command, currentUser database.User) error {
