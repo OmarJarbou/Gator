@@ -244,3 +244,21 @@ func handleFollowFeed(state *state, cmd command) error {
 
 	return nil
 }
+
+func handleListFollowing(state *state, cmd command) error {
+	if len(cmd.Arguments) != 0 {
+		return errors.New("THE LIST FOLLOWING HANDLER DOES NOT EXPECT ANY ARGUMENTS")
+	}
+
+	currentUserName := state.Config.CurrentUserName
+	followedFeeds, err := state.DBQueries.GetFeedFollowsForUser(context.Background(), currentUserName)
+	if err != nil {
+		return errors.New("FAILED TO GET FOLLOWED FEEDS: " + err.Error())
+	}
+
+	fmt.Println("Feeds followed by", currentUserName+":")
+	for _, feed := range followedFeeds {
+		fmt.Println(feed.FeedName)
+	}
+	return nil
+}
