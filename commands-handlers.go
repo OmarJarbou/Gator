@@ -91,5 +91,12 @@ func handleRegister(state *state, cmd command) error {
 	state.Config.CurrentUserName = cmd.Arguments[0]
 	fmt.Println("User", usr.Name, "created successfully!")
 	fmt.Println("Created at:", usr.CreatedAt)
+
+	err3 := config.SetUser(cmd.Arguments[0], state.Config)
+	if err3 != nil {
+		return err3
+	}
+	fmt.Println("User set to", cmd.Arguments[0])
+
 	return nil
 }
