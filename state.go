@@ -2,8 +2,10 @@ package main
 
 import (
 	"github.com/OmarJarbou/Gator/internal/config"
+	"github.com/OmarJarbou/Gator/internal/database"
 )
 
 type state struct {
-	Config *(config.Config)
+	DBQueries *database.Queries
+	Config    *(config.Config)
 }
